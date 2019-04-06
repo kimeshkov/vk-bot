@@ -53,7 +53,8 @@ class RequestHandler extends AbstractHandler {
                 case MESSAGE_TYPE:
                     JsonObject object = requestJson.getAsJsonObject("object");
                     int userId = object.getAsJsonPrimitive("user_id").getAsInt();
-                    botRequestHandler.handle(userId);
+                    String msg = object.getAsJsonPrimitive("body").getAsString();
+                    botRequestHandler.handle(userId, msg);
                     responseBody = OK_BODY;
                     break;
                 default:
