@@ -1,2 +1,3 @@
 rootProject.name = 'vk-bot'
+include 'vk-bot-main'
 
