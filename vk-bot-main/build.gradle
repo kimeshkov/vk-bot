@@ -1,14 +1,43 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 group 'com.barinthecityshow'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'application'
 
-sourceCompatibility = 1.5
+mainClassName = "com.barinthecityshow.bot.Application"
 
 repositories {
     mavenCentral()
 }
 
+ext {
+    groupId = '180716599'
+    token = '5c4b22d8502ba3d20876f285be56f94f9bc4114b34996dc4e3ca2ef35724cf95a4e5a5f70246ef0ecfd5a'
+    confirmationCode = '53970561'
+    serverId = '1'
+}
+
 dependencies {
+    compile group: 'com.vk.api', name: 'sdk', version: vkSdkVersion
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: log4jVersion
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4jVersion
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: jettyVersion
+
     testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+processResources {
+    eachFile { details ->
+        if (details.name.endsWith('.properties')) {
+            details.filter(ReplaceTokens, tokens: [
+                    'groupId'         : groupId,
+                    'token'           : token,
+                    'serverId'        : serverId,
+                    'confirmationCode': confirmationCode,
+            ])
+        }
+    }
 }
