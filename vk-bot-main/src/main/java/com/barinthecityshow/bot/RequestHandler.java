@@ -1,5 +1,6 @@
 package com.barinthecityshow.bot;
 
+import com.barinthecityshow.bot.handler.BotRequestHandler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -52,7 +53,7 @@ class RequestHandler extends AbstractHandler {
                     break;
                 case MESSAGE_TYPE:
                     JsonObject object = requestJson.getAsJsonObject("object");
-                    int userId = object.getAsJsonPrimitive("user_id").getAsInt();
+                    long userId = object.getAsJsonPrimitive("user_id").getAsLong();
                     String msg = object.getAsJsonPrimitive("body").getAsString();
                     botRequestHandler.handle(userId, msg);
                     responseBody = OK_BODY;
