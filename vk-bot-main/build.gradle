@@ -25,6 +25,8 @@ ext {
 
 dependencies {
     compile group: 'com.vk.api', name: 'sdk', version: vkSdkVersion
+
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: commonsLangVersion
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: log4jVersion
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4jVersion
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
