@@ -22,7 +22,7 @@ public class VkApiService {
         this.actor = actor;
     }
 
-    public void handle(int userId, String msg) {
+    public void sendMessage(Integer userId, String msg) {
         try {
             apiClient.messages()
                     .send(actor)

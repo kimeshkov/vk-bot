@@ -11,7 +11,9 @@ import com.barinthecityshow.bot.service.VkApiService;
 import java.util.Objects;
 
 public class QuestionAnswerStateMachine implements BotRequestHandler {
-    private final State<Long, ChainElement<QuestionAnswer>> state = ConcurrentMapState.INSTANCE;
+    private static final String WELCOME_MSG = "Привет, хочешь стикер? Тогда ответь на вопрос: ";
+
+    private final State<Integer, ChainElement<QuestionAnswer>> state = ConcurrentMapState.INSTANCE;
     private final DialogChain dialogChain = new StickerDialogChain();
     private final VkApiService vkApiService;
 
@@ -19,7 +21,7 @@ public class QuestionAnswerStateMachine implements BotRequestHandler {
         this.vkApiService = vkApiService;
     }
 
-    public void handle(Long userId, String msg) {
+    public void handle(Integer userId, String msg) {
         if (state.containsKey(userId)) {
             ChainElement<QuestionAnswer> first = dialogChain.getFirst();
             handleNew(userId, first.current());
@@ -42,7 +44,9 @@ public class QuestionAnswerStateMachine implements BotRequestHandler {
 
     }
 
-    private void handleNew(Long userId, QuestionAnswer questionAnswer) {
+    private void handleNew(Integer userId, QuestionAnswer first) {
+        String msg = WELCOME_MSG.concat(first.getQuestion());
+        vkApiService.sendMessage(userId, msg);
 
     }
 
@@ -52,7 +56,7 @@ public class QuestionAnswerStateMachine implements BotRequestHandler {
                 .anyMatch(s -> Objects.equals(s, msg));
     }
 
-    private void handleCorrect(Long userId, QuestionAnswer current) {
+    private void handleCorrect(Integer userId, QuestionAnswer current) {
 
     }
 
@@ -60,6 +64,6 @@ public class QuestionAnswerStateMachine implements BotRequestHandler {
 
     }
 
-    private void handleStop(Long userId) {
+    private void handleStop(Integer userId) {
     }
 }
