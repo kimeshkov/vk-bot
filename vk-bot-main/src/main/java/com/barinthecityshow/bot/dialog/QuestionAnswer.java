@@ -8,10 +8,6 @@ public class QuestionAnswer {
     private List<String> correctAnswers;
     private List<String> options = new ArrayList<>();
 
-    QuestionAnswer(String question) {
-        this.question = question;
-    }
-
     public QuestionAnswer(String question, List<String> correctAnswers) {
         this.question = question;
         this.correctAnswers = correctAnswers;

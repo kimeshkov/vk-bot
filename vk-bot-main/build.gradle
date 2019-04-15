@@ -26,6 +26,7 @@ ext {
 dependencies {
     compile group: 'com.vk.api', name: 'sdk', version: vkSdkVersion
 
+    compile group: 'com.google.guava', name: 'guava', version: guavaVersion
     compile group: 'org.apache.commons', name: 'commons-lang3', version: commonsLangVersion
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: log4jVersion
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4jVersion

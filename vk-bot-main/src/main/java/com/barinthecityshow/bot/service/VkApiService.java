@@ -4,6 +4,7 @@ import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
+import com.vk.api.sdk.objects.groups.MemberStatusFull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,24 @@ public class VkApiService {
             LOG.error("INVALID REQUEST", e);
         } catch (ClientException e) {
             LOG.error("NETWORK ERROR", e);
+        }
+    }
+
+    public boolean isSubscribed(Integer userId) {
+        try {
+            return apiClient.groups()
+                    .isMemberExtended(actor, String.valueOf(actor.getGroupId()), userId)
+                    .execute()
+                    .stream()
+                    .findFirst()
+                    .map(MemberStatusFull::isMember)
+                    .orElse(false);
+        } catch (ApiException e) {
+            LOG.error("INVALID REQUEST", e);
+            throw new RuntimeException(e);
+        } catch (ClientException e) {
+            LOG.error("NETWORK ERROR", e);
+            throw new RuntimeException(e);
         }
     }
 }

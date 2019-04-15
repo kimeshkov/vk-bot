@@ -23,6 +23,12 @@ public enum ConcurrentMapState implements State<Integer, ChainElement<QuestionAn
     }
 
     @Override
+    public ChainElement<QuestionAnswer> remove(Integer key) {
+        return state.remove(key);
+    }
+
+
+    @Override
     public boolean containsKey(Integer key) {
         return state.containsKey(key);
     }

@@ -6,6 +6,8 @@ public interface State<K, V> {
 
     V get(K key);
 
+    V remove(K key);
+
     boolean containsKey(K key);
 
 }
