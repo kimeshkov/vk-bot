@@ -14,7 +14,7 @@ public class QuestionAnswerStateMachine implements BotRequestHandler {
     private static final String SUBSCRIBE_MSG = "Подпишись и попробуй заново";
     private static final String CORRECT_ANS_MSG = "Правильно! Следующий вопрос: ";
     private static final String WRONG_ANS_MSG = "Эх, неправильно. Напиши СТОП, если сдаешься или попробуй еще раз!";
-    private static final String WIN_MSG = "Ура, привильно! Держи стикер";
+    private static final String WIN_MSG = "Ура, правильно! Держи стикер";
     private static final String BYE_MSG = "Ок, возвращайся потом";
     private static final String START_MSG = "Хочу стикер";
     private static final String STOP_MSG = "Стоп";

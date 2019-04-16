@@ -16,13 +16,14 @@ public class StickerDialogChain implements DialogChain {
 
     @Override
     public ChainElement<QuestionAnswer> getFirst() {
-        Map.Entry<String, String> qa = getRandomEntry();
-        QuestionAnswer questionAnswer = new QuestionAnswer(qa.getKey(), Lists.newArrayList(qa.getValue()));
+        QuestionAnswer questionAnswer = QuestionAnswer.builder()
+                .question("Сколько раз Бандерас выступал пьяным?")
+                .addCorrectAnswer("2")
+                .addCorrectAnswer("два")
+                .addCorrectAnswer("два раза")
+                .build();
         return new QuestionAnswerChainElement(questionAnswer);
     }
 
-    private Map.Entry<String, String> getRandomEntry() {
-        return questionAns.entrySet().stream().findFirst().orElseThrow(RuntimeException::new);
 
-    }
 }
