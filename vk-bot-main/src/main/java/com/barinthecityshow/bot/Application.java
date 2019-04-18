@@ -1,5 +1,7 @@
 package com.barinthecityshow.bot;
 
+import com.barinthecityshow.bot.dialog.chain.DialogChain;
+import com.barinthecityshow.bot.dialog.chain.StickerDialogChain;
 import com.barinthecityshow.bot.handler.QuestionAnswerStateMachine;
 import com.barinthecityshow.bot.service.VkApiService;
 import com.vk.api.sdk.client.VkApiClient;
@@ -31,7 +33,7 @@ public class Application {
         GroupActor actor = initVkApi(apiClient, readProperties());
         VkApiService vkApiService = new VkApiService(apiClient, actor);
 
-        QuestionAnswerStateMachine botHandler = new QuestionAnswerStateMachine(vkApiService);
+        QuestionAnswerStateMachine botHandler = new QuestionAnswerStateMachine(vkApiService, initDialogChain());
 
         Server server = new Server(8080);
         server.setHandler(new RequestHandler(botHandler, properties.getProperty("confirmationCode")));
@@ -39,6 +41,10 @@ public class Application {
 
         LOG.info("Started");
         server.join();
+    }
+
+    private static DialogChain initDialogChain() {
+        return new StickerDialogChain();
     }
 
     private static GroupActor initVkApi(VkApiClient apiClient, Properties properties) {

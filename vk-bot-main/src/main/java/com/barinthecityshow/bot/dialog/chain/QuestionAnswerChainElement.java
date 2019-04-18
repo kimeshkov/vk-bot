@@ -11,7 +11,7 @@ public class QuestionAnswerChainElement implements ChainElement<QuestionAnswer> 
 
     private QuestionAnswer current;
 
-    QuestionAnswerChainElement(QuestionAnswer current) {
+    public QuestionAnswerChainElement(QuestionAnswer current) {
         this.current = current;
     }
 

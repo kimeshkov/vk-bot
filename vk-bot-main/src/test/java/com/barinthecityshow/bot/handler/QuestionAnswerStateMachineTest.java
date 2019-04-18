@@ -1,63 +1,120 @@
 package com.barinthecityshow.bot.handler;
 
 import com.barinthecityshow.bot.dialog.QuestionAnswer;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.barinthecityshow.bot.dialog.chain.DialogChain;
+import com.barinthecityshow.bot.dialog.chain.QuestionAnswerChainElement;
+import com.barinthecityshow.bot.service.VkApiService;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.List;
+import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class QuestionAnswerStateMachineTest {
 
-    private String json = "[\n" +
-            "  {\n" +
-            "    \"question\": \"Кто ты из бара?\",\n" +
-            "    \"correctAnswers\": [\n" +
-            "      \"никто\",\n" +
-            "      \"хз\",\n" +
-            "      \"человек\",\n" +
-            "      \"шац\"\n" +
-            "    ],\n" +
-            "    \"options\": [\n" +
-            "      \"звер\",\n" +
-            "      \"птица\",\n" +
-            "      \"шац\"\n" +
-            "    ]\n" +
-            "  },\n" +
-            "  {\n" +
-            "    \"question\": \"Кто ты из бара?\",\n" +
-            "    \"correctAnswers\": [\n" +
-            "      \"никто\",\n" +
-            "      \"хз\",\n" +
-            "      \"человек\",\n" +
-            "      \"шац\"\n" +
-            "    ],\n" +
-            "    \"options\": [\n" +
-            "      \"звер\",\n" +
-            "      \"птица\",\n" +
-            "      \"шац\"\n" +
-            "    ]\n" +
-            "  }\n" +
-            "]";
+    @Mock
+    private VkApiService vkApiService;
+
+    @Mock
+    private DialogChain dialogChain;
+
+    private QuestionAnswerStateMachine questionAnswerStateMachine;
+
+    @Before
+    public void init() throws Exception {
+        reset(vkApiService, dialogChain);
+        questionAnswerStateMachine = new QuestionAnswerStateMachine(vkApiService, dialogChain);
+    }
 
     @Test
     public void shouldDoNothing_WhenNotStickerMsg() throws Exception {
-        QuestionAnswer questionAnswer = QuestionAnswer.builder()
-                .question("Кто ты из бара?")
-                .addCorrectAnswer("никто")
-                .addCorrectAnswer("хз")
-                .addCorrectAnswer("человек")
-                .addCorrectAnswer("шац")
-                .addOption("звер")
-                .addOption("птица")
-                .addOption("шац")
-                .build();
-        Gson gson = new GsonBuilder().create();
-        System.out.println(gson.toJson(questionAnswer));
+        //arrange
+        String msg = "Not sticker Msg";
+        Integer userId = new Random().nextInt();
 
-        gson.fromJson(json, QuestionAnswer[].class);
+        //act
+        questionAnswerStateMachine.handle(userId, msg);
+
+        //verify
+        verify(vkApiService, never()).sendMessage(anyInt(), anyString());
+
+    }
+
+    @Test
+    public void shouldSendSubscribeMsg_WhenStickerMsgAndUserNotSubscribed() throws Exception {
+        //arrange
+        String msg = "Хочу стикер";
+        Integer userId = new Random().nextInt();
+
+        when(vkApiService.isSubscribed(userId)).thenReturn(false);
+
+        //act
+        questionAnswerStateMachine.handle(userId, msg);
+
+        //verify
+        verify(vkApiService).sendMessage(userId, Messages.SUBSCRIBE_MSG.getValue());
+
+    }
+
+    @Test
+    public void shouldSendFirstQuestion_WhenStickerMsgAndUserSubscribed() throws Exception {
+        //arrange
+        String msg = "Хочу стикер";
+        Integer userId = new Random().nextInt();
+
+        QuestionAnswer questionAnswer = QuestionAnswer.builder()
+                .question("What question")
+                .build();
+
+        QuestionAnswerChainElement chainElement = new QuestionAnswerChainElement(questionAnswer);
+
+
+        when(vkApiService.isSubscribed(userId)).thenReturn(true);
+        when(dialogChain.getFirst()).thenReturn(chainElement);
+
+        //act
+        questionAnswerStateMachine.handle(userId, msg);
+
+        //verify
+        String result = Messages.WELCOME_MSG.getValue().concat(questionAnswer.getQuestion());
+        verify(vkApiService).sendMessage(userId, result);
+
+    }
+
+    @Test
+    public void shouldSendTryAgain_WhenWrongAnswer() throws Exception {
+        //arrange
+        String msg = "Хочу стикер";
+        String answer = "Wrong";
+        Integer userId = new Random().nextInt();
+
+        QuestionAnswer questionAnswer = QuestionAnswer.builder()
+                .question("What question")
+                .addCorrectAnswer("Correct")
+                .build();
+
+        QuestionAnswerChainElement chainElement = new QuestionAnswerChainElement(questionAnswer);
+
+
+        when(vkApiService.isSubscribed(userId)).thenReturn(true);
+        when(dialogChain.getFirst()).thenReturn(chainElement);
+
+        //act
+        questionAnswerStateMachine.handle(userId, msg);
+        questionAnswerStateMachine.handle(userId, answer);
+
+        //verify
+        verify(vkApiService).sendMessage(userId, Messages.WRONG_ANS_MSG.getValue());
 
     }
 }

@@ -3,34 +3,25 @@ package com.barinthecityshow.bot.handler;
 import com.barinthecityshow.bot.chain.ChainElement;
 import com.barinthecityshow.bot.dialog.QuestionAnswer;
 import com.barinthecityshow.bot.dialog.chain.DialogChain;
-import com.barinthecityshow.bot.dialog.chain.StickerDialogChain;
 import com.barinthecityshow.bot.service.VkApiService;
 import com.barinthecityshow.bot.state.ConcurrentMapState;
 import com.barinthecityshow.bot.state.State;
 import org.apache.commons.lang3.StringUtils;
 
 public class QuestionAnswerStateMachine implements BotRequestHandler {
-    private static final String WELCOME_MSG = "Привет, раз хочешь стикер, ответь на вопрос: ";
-    private static final String SUBSCRIBE_MSG = "Подпишись и попробуй заново";
-    private static final String CORRECT_ANS_MSG = "Правильно! Следующий вопрос: ";
-    private static final String WRONG_ANS_MSG = "Эх, неправильно. Напиши СТОП, если сдаешься или попробуй еще раз!";
-    private static final String WIN_MSG = "Ура, правильно! Держи стикер";
-    private static final String BYE_MSG = "Ок, возвращайся потом";
-    private static final String START_MSG = "Хочу стикер";
-    private static final String STOP_MSG = "Стоп";
-
 
     private final State<Integer, ChainElement<QuestionAnswer>> state = ConcurrentMapState.INSTANCE;
-    private final DialogChain dialogChain = new StickerDialogChain();
+    private final DialogChain dialogChain;
     private final VkApiService vkApiService;
 
-    public QuestionAnswerStateMachine(VkApiService vkApiService) {
+    public QuestionAnswerStateMachine(VkApiService vkApiService, DialogChain dialogChain) {
         this.vkApiService = vkApiService;
+        this.dialogChain = dialogChain;
     }
 
     public void handle(Integer userId, String msg) {
         if (!state.containsKey(userId)) {
-            if (!StringUtils.equalsIgnoreCase(msg, START_MSG)) {
+            if (!StringUtils.equalsIgnoreCase(msg, Messages.START_MSG.getValue())) {
                 return;
             }
             if (!vkApiService.isSubscribed(userId)) {
@@ -64,16 +55,16 @@ public class QuestionAnswerStateMachine implements BotRequestHandler {
     }
 
     private void handleNotSubscribed(Integer userId) {
-        vkApiService.sendMessage(userId, SUBSCRIBE_MSG);
+        vkApiService.sendMessage(userId, Messages.SUBSCRIBE_MSG.getValue());
     }
 
     private void handleNew(Integer userId, QuestionAnswer first) {
-        String msg = WELCOME_MSG.concat(first.getQuestion());
+        String msg = Messages.WELCOME_MSG.getValue().concat(first.getQuestion());
         vkApiService.sendMessage(userId, msg);
     }
 
     private boolean isStopMsg(String msg) {
-        return StringUtils.equalsIgnoreCase(msg, STOP_MSG);
+        return StringUtils.equalsIgnoreCase(msg, Messages.STOP_MSG.getValue());
     }
 
     private boolean isCorrectAnswer(String msg, QuestionAnswer questionAnswer) {
@@ -83,21 +74,21 @@ public class QuestionAnswerStateMachine implements BotRequestHandler {
     }
 
     private void handleNext(Integer userId, QuestionAnswer next) {
-        String msg = CORRECT_ANS_MSG.concat(next.getQuestion());
+        String msg = Messages.CORRECT_ANS_MSG.getValue().concat(next.getQuestion());
         vkApiService.sendMessage(userId, msg);
     }
 
     private void handleWrong(Integer userId) {
-        vkApiService.sendMessage(userId, WRONG_ANS_MSG);
+        vkApiService.sendMessage(userId, Messages.WRONG_ANS_MSG.getValue());
     }
 
     private void handleWin(Integer userId) {
-        vkApiService.sendMessage(userId, WIN_MSG);
+        vkApiService.sendMessage(userId, Messages.WIN_MSG.getValue());
         state.remove(userId);
     }
 
     private void handleStop(Integer userId) {
-        vkApiService.sendMessage(userId, BYE_MSG);
+        vkApiService.sendMessage(userId, Messages.BYE_MSG.getValue());
         state.remove(userId);
     }
 }
