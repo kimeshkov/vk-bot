@@ -29,20 +29,31 @@ public class StickerDialogChain implements DialogChain {
     private static List<QuestionAnswer> initQuestionAnswers() {
         return Lists.newArrayList(
                 QuestionAnswer.builder()
-                        .question("Сколько раз Бандерас выступал пьяным?")
-                        .addCorrectAnswer("2")
-                        .addCorrectAnswer("два")
-                        .addCorrectAnswer("два раза")
-                        .addCorrectAnswer("дважды")
+                        .question("Что ела Клава Кока из своих ботинок?")
+                        .addCorrectAnswer("Курицу")
+                        .addCorrectAnswer("Курица")
+                        .addCorrectAnswer("Курочку")
+                        .addCorrectAnswer("Курочка")
+                        .addCorrectAnswer("Мясо")
                         .build(),
                 QuestionAnswer.builder()
-                        .question("Во сколько лет Нечаев сделал первую пародию?")
-                        .addCorrectAnswer("6")
-                        .addCorrectAnswer("шесть")
-                        .addCorrectAnswer("в шесть лет")
-                        .addCorrectAnswer("в шесть")
-                        .addCorrectAnswer("в 6 лет")
-                        .addCorrectAnswer("в 6")
+                        .question("Кто первым показал мем ББПЕ Валерию?")
+                        .addCorrectAnswer("Мама")
+                        .addCorrectAnswer("Мать")
+                        .addCorrectAnswer("Ма")
+                        .addCorrectAnswer("Родители")
+                        .build(),
+                QuestionAnswer.builder()
+                        .question("За что Kyivstoner получил президентскую награду?")
+                        .addCorrectAnswer("За волонтёрство")
+                        .addCorrectAnswer("за волонтерство")
+                        .addCorrectAnswer("волонтерство")
+                        .addCorrectAnswer("волонтёрство")
+                        .addCorrectAnswer("волонтёрство")
+                        .addCorrectAnswer("волонтёрскую деятельность")
+                        .addCorrectAnswer("за волонтёрскую деятельность")
+                        .addCorrectAnswer("волонтерскую деятельность")
+
                         .build()
         );
 

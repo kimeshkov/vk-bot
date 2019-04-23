@@ -117,4 +117,58 @@ public class QuestionAnswerStateMachineTest {
         verify(vkApiService).sendMessage(userId, Messages.WRONG_ANS_MSG.getValue());
 
     }
+
+    @Test
+    public void shouldSendWinMsg_WhenCorrectAnswer_AndNoMoreQuestions() throws Exception {
+        //arrange
+        String msg = "Хочу стикер";
+        String answer = "Correct";
+        Integer userId = new Random().nextInt();
+
+        QuestionAnswer questionAnswer = QuestionAnswer.builder()
+                .question("What question")
+                .addCorrectAnswer("Correct")
+                .build();
+
+        QuestionAnswerChainElement chainElement = new QuestionAnswerChainElement(questionAnswer);
+
+
+        when(vkApiService.isSubscribed(userId)).thenReturn(true);
+        when(dialogChain.getFirst()).thenReturn(chainElement);
+
+        //act
+        questionAnswerStateMachine.handle(userId, msg);
+        questionAnswerStateMachine.handle(userId, answer);
+
+        //verify
+        verify(vkApiService).sendMessage(userId, Messages.WIN_MSG.getValue());
+
+    }
+
+    @Test
+    public void не_Должно_Быть_Разницы_Между_Е_И_Ё() throws Exception {
+        //arrange
+        String msg = "Хочу стикер";
+        String answer = "небо";
+        Integer userId = new Random().nextInt();
+
+        QuestionAnswer questionAnswer = QuestionAnswer.builder()
+                .question("What question")
+                .addCorrectAnswer("Нёбо")
+                .build();
+
+        QuestionAnswerChainElement chainElement = new QuestionAnswerChainElement(questionAnswer);
+
+
+        when(vkApiService.isSubscribed(userId)).thenReturn(true);
+        when(dialogChain.getFirst()).thenReturn(chainElement);
+
+        //act
+        questionAnswerStateMachine.handle(userId, msg);
+        questionAnswerStateMachine.handle(userId, answer);
+
+        //verify
+        verify(vkApiService).sendMessage(userId, Messages.WIN_MSG.getValue());
+
+    }
 }

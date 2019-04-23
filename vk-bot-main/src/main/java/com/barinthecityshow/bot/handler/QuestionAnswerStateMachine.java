@@ -19,7 +19,9 @@ public class QuestionAnswerStateMachine implements BotRequestHandler {
         this.dialogChain = dialogChain;
     }
 
-    public void handle(Integer userId, String msg) {
+    public void handle(Integer userId, String userMsg) {
+        String msg = prepareMsg(userMsg);
+
         if (!state.containsKey(userId)) {
             if (!StringUtils.equalsIgnoreCase(msg, Messages.START_MSG.getValue())) {
                 return;
@@ -54,6 +56,10 @@ public class QuestionAnswerStateMachine implements BotRequestHandler {
 
     }
 
+    private String prepareMsg(String userMsg) {
+        return StringUtils.replaceChars(userMsg.toUpperCase(), 'Ё', 'Е');
+    }
+
     private void handleNotSubscribed(Integer userId) {
         vkApiService.sendMessage(userId, Messages.SUBSCRIBE_MSG.getValue());
     }
@@ -70,7 +76,7 @@ public class QuestionAnswerStateMachine implements BotRequestHandler {
     private boolean isCorrectAnswer(String msg, QuestionAnswer questionAnswer) {
         return questionAnswer.getCorrectAnswers()
                 .stream()
-                .anyMatch(s -> StringUtils.equalsIgnoreCase(s, msg));
+                .anyMatch(s -> StringUtils.equalsIgnoreCase(prepareMsg(s), prepareMsg(msg)));
     }
 
     private void handleNext(Integer userId, QuestionAnswer next) {
