@@ -7,6 +7,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.io.Reader;
 
 class RequestHandler extends AbstractHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(RequestHandler.class);
 
     private final static String CONFIRMATION_TYPE = "confirmation";
     private final static String MESSAGE_TYPE = "message_new";
@@ -34,6 +37,7 @@ class RequestHandler extends AbstractHandler {
             throws IOException, ServletException {
 
         if (!"POST".equalsIgnoreCase(request.getMethod())) {
+            LOG.error("This method is unsupported " + request.toString());
             throw new ServletException("This method is unsupported");
         }
 
