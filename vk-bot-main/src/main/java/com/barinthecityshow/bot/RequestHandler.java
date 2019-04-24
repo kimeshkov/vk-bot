@@ -1,19 +1,25 @@
 package com.barinthecityshow.bot;
 
+import com.barinthecityshow.bot.handler.BotRequestHandler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 class RequestHandler extends AbstractHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(RequestHandler.class);
 
     private final static String CONFIRMATION_TYPE = "confirmation";
     private final static String MESSAGE_TYPE = "message_new";
@@ -33,6 +39,7 @@ class RequestHandler extends AbstractHandler {
             throws IOException, ServletException {
 
         if (!"POST".equalsIgnoreCase(request.getMethod())) {
+            LOG.error("Error request:  " + prettyPrint(request));
             throw new ServletException("This method is unsupported");
         }
 
@@ -67,7 +74,16 @@ class RequestHandler extends AbstractHandler {
             baseRequest.setHandled(true);
             response.getWriter().println(responseBody);
         } catch (JsonParseException e) {
+            LOG.error("Error request:  " + prettyPrint(request));
             throw new ServletException("Incorrect json", e);
         }
+    }
+
+    private String prettyPrint(HttpServletRequest request) {
+        return Collections.list(request.getHeaderNames())
+                .stream()
+                .map(headerName -> headerName + ": " + request.getHeader(headerName))
+                .collect(Collectors.joining(System.lineSeparator()));
+
     }
 }
