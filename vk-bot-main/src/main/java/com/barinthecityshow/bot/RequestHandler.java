@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 class RequestHandler extends AbstractHandler {
     private static final Logger LOG = LoggerFactory.getLogger(RequestHandler.class);
@@ -37,7 +39,7 @@ class RequestHandler extends AbstractHandler {
             throws IOException, ServletException {
 
         if (!"POST".equalsIgnoreCase(request.getMethod())) {
-            LOG.error("This method is unsupported " + request.toString());
+            LOG.error("Error request:  " + prettyPrint(request));
             throw new ServletException("This method is unsupported");
         }
 
@@ -72,7 +74,16 @@ class RequestHandler extends AbstractHandler {
             baseRequest.setHandled(true);
             response.getWriter().println(responseBody);
         } catch (JsonParseException e) {
+            LOG.error("Error request:  " + prettyPrint(request));
             throw new ServletException("Incorrect json", e);
         }
+    }
+
+    private String prettyPrint(HttpServletRequest request) {
+        return Collections.list(request.getHeaderNames())
+                .stream()
+                .map(headerName -> headerName + ": " + request.getHeader(headerName))
+                .collect(Collectors.joining(System.lineSeparator()));
+
     }
 }
