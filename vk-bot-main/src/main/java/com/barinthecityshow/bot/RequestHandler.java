@@ -38,8 +38,9 @@ class RequestHandler extends AbstractHandler {
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
+        LOG.debug("Request:  " + prettyPrint(request));
+
         if (!"POST".equalsIgnoreCase(request.getMethod())) {
-            LOG.error("Error request:  " + prettyPrint(request));
             throw new ServletException("This method is unsupported");
         }
 
@@ -74,16 +75,24 @@ class RequestHandler extends AbstractHandler {
             baseRequest.setHandled(true);
             response.getWriter().println(responseBody);
         } catch (JsonParseException e) {
-            LOG.error("Error request:  " + prettyPrint(request));
             throw new ServletException("Incorrect json", e);
         }
     }
 
     private String prettyPrint(HttpServletRequest request) {
-        return Collections.list(request.getHeaderNames())
+        String method = request.getMethod();
+
+        String header = Collections.list(request.getHeaderNames())
                 .stream()
                 .map(headerName -> headerName + ": " + request.getHeader(headerName))
                 .collect(Collectors.joining(System.lineSeparator()));
+
+        String params = Collections.list(request.getParameterNames())
+                .stream()
+                .map(paramName -> paramName + ": " + request.getParameter(paramName))
+                .collect(Collectors.joining(System.lineSeparator()));
+
+        return String.join(System.lineSeparator(), method, header, params);
 
     }
 }
